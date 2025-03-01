@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 30px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      margin: auto;
+    }
+    h2 {
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #218838;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 18px;
+      padding: 10px;
+      background: #fff3cd;
+      border-radius: 5px;
+      display: none;
+    }
+    .print-btn {
+      background: #007bff;
+      margin-top: 10px;
+    }
+  </style>
+  <script>
+    function calculateBill() {
+      var gross = document.getElementById("gross").value;
+      var entity = document.getElementById("entity").value;
+      
+      if (!gross) {
+        alert("Please enter a Gross Value.");
+        return;
+      }
+
+      google.script.run.withSuccessHandler(displayResults).calculateValues(gross, entity);
+    }
+
+    function displayResults(results) {
+      var outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = results;
+      outputDiv.style.display = "block";
+    }
+
+    function printResults() {
+      var content = document.getElementById("output").innerHTML;
+      var printWindow = window.open('', '', 'height=400,width=600');
+      printWindow.document.write('<html><head><title>Bill Calculation</title></head><body>');
+      printWindow.document.write('<h2>Bill Calculation</h2>');
+      printWindow.document.write(content);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+    }
+  </script>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Bill Calculator</h2>
+    
+    <label>Gross Value:</label>
+    <input type="number" id="gross" placeholder="Enter Gross Value">
+    
+    <label>Entity Type:</label>
+    <select id="entity">
+      <option value="individual">Individual</option>
+      <option value="firm">Firm</option>
+    </select>
+    
+    <button onclick="calculateBill()">Calculate</button>
+    
+    <div id="output"></div>
+    
+    <button class="print-btn" onclick="printResults()">Print Results</button>
+  </div>
+
+</body>
+</html>
