@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+        }
+        label, input, select, button {
+            display: block;
+            margin: 10px auto;
+            width: 90%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background: #6a11cb;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #2575fc;
+        }
+        .output {
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 10px;
+            white-space: pre;
+            background: #e8e8e8;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bill Calculator</h2>
+        <label>Bill Type: 
+            <select id="billType" onchange="toggleBillType()">
+                <option value="final">Final Bill</option>
+                <option value="part">Part Bill</option>
+            </select>
+        </label>
+        
+        <div id="finalBillInputs">
+            <label>Total Value: <input type="number" id="totalValue"></label>
+            <label>Amount Already Paid: <input type="number" id="amountPaid"></label>
+            <label>Individual / Firm: 
+                <select id="entityType">
+                    <option value="individual">Individual</option>
+                    <option value="firm">Firm</option>
+                </select>
+            </label>
+            <label>IT Deducted: <input type="number" id="itDeducted"></label>
+            <label>GST Deducted: <input type="number" id="gstDeducted"></label>
+            <label>Deduct GST? <input type="checkbox" id="deductGST"></label>
+        </div>
+        
+        <div id="partBillInputs" style="display:none;">
+            <label>Bill Value: <input type="number" id="billValue"></label>
+            <label>Amount Already Paid: <input type="number" id="partAmountPaid"></label>
+            <label>Individual / Firm: 
+                <select id="partEntityType">
+                    <option value="individual">Individual</option>
+                    <option value="firm">Firm</option>
+                </select>
+            </label>
+            <label>IT Deducted: <input type="number" id="partItDeducted"></label>
+            <label>GST Deducted: <input type="number" id="partGstDeducted"></label>
+            <label>Deduct GST? <input type="checkbox" id="partDeductGST"></label>
+        </div>
+        
+        <button onclick="calculateBill()">Calculate</button>
+        
+        <div class="output" id="output"></div>
+    </div>
+    
+    <script>
+        function toggleBillType() {
+            let billType = document.getElementById('billType').value;
+            document.getElementById('finalBillInputs').style.display = billType === 'final' ? 'block' : 'none';
+            document.getElementById('partBillInputs').style.display = billType === 'part' ? 'block' : 'none';
+        }
+        
+        function calculateBill() {
+            let billType = document.getElementById('billType').value;
+            let output = document.getElementById('output');
+            let result = "";
+            
+            if (billType === 'final') {
+                let totalValue = parseFloat(document.getElementById('totalValue').value) || 0;
+                let amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+                let entityType = document.getElementById('entityType').value;
+                let itDeducted = parseFloat(document.getElementById('itDeducted').value) || 0;
+                let gstDeducted = parseFloat(document.getElementById('gstDeducted').value) || 0;
+                let deductGST = document.getElementById('deductGST').checked;
+                
+                let taxableValue = Math.round(totalValue / 1.18);
+                let amountToBePaid = totalValue - amountPaid;
+                let itDeduction = Math.round((entityType === 'individual' ? 0.01 : 0.02) * taxableValue - itDeducted);
+                let whaDeduction = Math.round(totalValue * 0.05);
+                let gstDeduction = deductGST ? Math.round(0.02 * taxableValue - gstDeducted) : 0;
+                if (gstDeduction % 2 !== 0) gstDeduction++;
+                let totalDeduction = itDeduction + whaDeduction;
+                let netValue = amountToBePaid - totalDeduction;
+                let ecs = netValue - gstDeduction;
+                
+                result = `Total Value: ${totalValue}\nAmount Paid: ${amountPaid}\nAmount now to be paid: ${amountToBePaid}\nIT Deduction: ${itDeduction}\nWHA Deduction: ${whaDeduction}\nTotal Deduction: ${totalDeduction}\nNet Value: ${netValue}\nGST Deduction: ${gstDeduction}\nECS: ${ecs}`;
+            } else {
+                let billValue = parseFloat(document.getElementById('billValue').value) || 0;
+                let partAmountPaid = parseFloat(document.getElementById('partAmountPaid').value) || 0;
+                let partEntityType = document.getElementById('partEntityType').value;
+                let partItDeducted = parseFloat(document.getElementById('partItDeducted').value) || 0;
+                let partGstDeducted = parseFloat(document.getElementById('partGstDeducted').value) || 0;
+                let partDeductGST = document.getElementById('partDeductGST').checked;
+                
+                let taxableValue = Math.round(billValue * 0.95);
+                let whaDeduction = Math.round(billValue * 0.05);
+                let addgst = Math.round(taxableValue * 0.18);
+                let grossValue = taxableValue + Math.round(taxableValue * 0.18);
+                let amountNowToBePaid = grossValue - partAmountPaid;
+                let itDeduction = Math.round((partEntityType === 'individual' ? 0.01 : 0.02) * taxableValue - partItDeducted);
+                let gstDeduction = partDeductGST ? Math.round(0.02 * taxableValue - partGstDeducted) : 0;
+                if (gstDeduction % 2 !== 0) gstDeduction++;
+                let netValue = amountNowToBePaid - itDeduction;
+                let ecs = netValue - gstDeduction;
+                
+                result = `Bill Value: ${billValue}\nWHA Deduction: ${whaDeduction}\nTaxable Value: ${taxableValue}\nADD GST : ${addgst}\nGross Value: ${grossValue}\nAmount already paid: ${partAmountPaid}\nAmount Now to Be Paid: ${amountNowToBePaid}\nIT Deduction: ${itDeduction}\nNet Value: ${netValue}\nGST Deduction: ${gstDeduction}\nECS: ${ecs}`;
+            }
+            
+            output.textContent = result;
+        }
+    </script>
+</body>
+</html>
+
+
