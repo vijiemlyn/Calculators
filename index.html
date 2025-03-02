@@ -50,6 +50,21 @@
             padding: 10px;
             border-radius: 5px;
         }
+        table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: right;
+    min-width: 150px; /* Adjust this value as needed */
+}
+
+th {
+    background-color: #f2f2f2;
+}
     </style>
 </head>
 <body>
@@ -105,7 +120,8 @@
         function calculateBill() {
             let billType = document.getElementById('billType').value;
             let output = document.getElementById('output');
-            let result = "";
+              let tableHTML = "<table border='1'><tr><th>Parameter</th><th>Value</th></tr>";
+
             
             if (billType === 'final') {
                 let totalValue = parseFloat(document.getElementById('totalValue').value) || 0;
@@ -125,7 +141,17 @@
                 let netValue = amountToBePaid - totalDeduction;
                 let ecs = netValue - gstDeduction;
                 
-                result = `Total Value: ${totalValue}\nAmount Paid: ${amountPaid}\nAmount now to be paid: ${amountToBePaid}\nIT Deduction: ${itDeduction}\nWHA Deduction: ${whaDeduction}\nTotal Deduction: ${totalDeduction}\nNet Value: ${netValue}\nGST Deduction: ${gstDeduction}\nECS: ${ecs}`;
+                tableHTML +=  `<tr><td>Total Value</td><td>${totalValue}</td></tr>
+                              <tr><td>Amount Paid</td><td>${amountPaid}</td></tr>
+                              <tr><td>Amount to be Paid</td><td>${amountToBePaid}</td></tr>
+                              <tr><td>IT Deduction</td><td>${itDeduction}</td></tr>
+                              <tr><td>WHA Deduction</td><td>${whaDeduction}</td></tr>
+                              <tr><td>Total Deduction</td><td>${totalDeduction}</td></tr>
+                              <tr><td>Net Value</td><td>${netValue}</td></tr>
+                              <tr><td>GST Deduction</td><td>${gstDeduction}</td></tr>
+                              <tr><td>ECS</td><td>${ecs}</td></tr>`;
+                              
+               	
             } else {
                 let billValue = parseFloat(document.getElementById('billValue').value) || 0;
                 let partAmountPaid = parseFloat(document.getElementById('partAmountPaid').value) || 0;
@@ -145,13 +171,21 @@
                 let netValue = amountNowToBePaid - itDeduction;
                 let ecs = netValue - gstDeduction;
                 
-                result = `Bill Value: ${billValue}\nWHA Deduction: ${whaDeduction}\nTaxable Value: ${taxableValue}\nADD GST : ${addgst}\nGross Value: ${grossValue}\nAmount already paid: ${partAmountPaid}\nAmount Now to Be Paid: ${amountNowToBePaid}\nIT Deduction: ${itDeduction}\nNet Value: ${netValue}\nGST Deduction: ${gstDeduction}\nECS: ${ecs}`;
+                 tableHTML += `<tr><td>Bill Value</td><td>${billValue}</td></tr>
+                              <tr><td>WHA Deduction</td><td>${whaDeduction}</td></tr>
+                              <tr><td>Taxable Value</td><td>${taxableValue}</td></tr>
+                              <tr><td>ADD GST</td><td>${addgst}</td></tr>
+                              <tr><td>Gross Value</td><td>${grossValue}</td></tr>
+                              <tr><td>Amount Paid</td><td>${partAmountPaid}</td></tr>
+                              <tr><td>Amount Now to Be Paid</td><td>${amountNowToBePaid}</td></tr>
+                              <tr><td>IT Deduction</td><td>${itDeduction}</td></tr>
+                              <tr><td>Net Value</td><td>${netValue}</td></tr>
+                              <tr><td>GST Deduction</td><td>${gstDeduction}</td></tr>
+                              <tr><td>ECS</td><td>${ecs}</td></tr>`;
             }
-            
-            output.textContent = result;
+           tableHTML += "</table>";
+            output.innerHTML = tableHTML;
         }
     </script>
 </body>
 </html>
-
-
